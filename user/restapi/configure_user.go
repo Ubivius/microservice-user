@@ -4,20 +4,68 @@ package restapi
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
+	"sync"
+	"sync/atomic"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/swag"
 
+	"Ubivius/microservices/user-microservice/user/models"
 	"Ubivius/microservices/user-microservice/user/restapi/operations"
 	"Ubivius/microservices/user-microservice/user/restapi/operations/users"
 )
 
 //go:generate swagger generate server --target ..\..\user --name User --spec ..\swagger.yml --principal interface{}
 
+var exampleFlags = struct {
+	Example1 string `long:"example1" description:"Sample for showing how to configure cmd-line flags"`
+	Example2 string `long:"example2" description:"Further info at https://github.com/jessevdk/go-flags"`
+}{}
+
 func configureFlags(api *operations.UserAPI) {
-	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
+	api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{
+		swag.CommandLineOptionsGroup{
+			ShortDescription: "Example Flags",
+			LongDescription:  "",
+			Options:          &exampleFlags,
+		},
+	}
+}
+
+var items = make(map[int64]*models.User)
+var lastID int64
+
+var itemsLock = &sync.Mutex{}
+
+func newItemID() int64 {
+	return atomic.AddInt64(&lastID, 1)
+}
+
+func addItem(item *models.User) error {
+	if item == nil {
+		return errors.New(500, "Please specify a user")
+	}
+
+	itemsLock.Lock()
+	defer itemsLock.Unlock()
+
+	newID := newItemID()
+	item.ID = newID
+	items[newID] = item
+
+	return nil
+}
+
+func allItems() (result []*models.User) {
+	result = make([]*models.User, 0)
+	for _, item := range items {
+		result = append(result, item)
+	}
+	return
 }
 
 func configureAPI(api *operations.UserAPI) http.Handler {
@@ -34,20 +82,22 @@ func configureAPI(api *operations.UserAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	if api.UsersAddUserHandler == nil {
-		api.UsersAddUserHandler = users.AddUserHandlerFunc(func(params users.AddUserParams) middleware.Responder {
-			return middleware.NotImplemented("operation users.AddUser has not yet been implemented")
-		})
-	}
-	if api.UsersGetUsersHandler == nil {
-		api.UsersGetUsersHandler = users.GetUsersHandlerFunc(func(params users.GetUsersParams) middleware.Responder {
-			return middleware.NotImplemented("operation users.GetUsers has not yet been implemented")
-		})
-	}
+	api.UsersAddUserHandler = users.AddUserHandlerFunc(func(params users.AddUserParams) middleware.Responder {
+		if err := addItem(params.Body); err != nil {
+			return users.NewAddUserDefault(500).WithPayload(&models.Error{Code: 500, Message: swag.String(err.Error())})
+		}
+		return users.NewAddUserCreated().WithPayload(params.Body)
+	})
+
+	api.UsersGetUsersHandler = users.GetUsersHandlerFunc(func(params users.GetUsersParams) middleware.Responder {
+		return users.NewGetUsersOK().WithPayload(allItems())
+	})
 
 	api.PreServerShutdown = func() {}
 
 	api.ServerShutdown = func() {}
+	println(exampleFlags.Example1)
+	println(exampleFlags.Example2)
 
 	return setupGlobalMiddleware(api.Serve(setupMiddlewares))
 }
@@ -62,6 +112,9 @@ func configureTLS(tlsConfig *tls.Config) {
 // This function can be called multiple times, depending on the number of serving schemes.
 // scheme value will be set accordingly: "http", "https" or "unix"
 func configureServer(s *http.Server, scheme, addr string) {
+	if exampleFlags.Example1 != "something" {
+		fmt.Print("example1 argument is not something")
+	}
 }
 
 // The middleware configuration is for the handler executors. These do not apply to the swagger.json document.
