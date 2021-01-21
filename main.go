@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"handlers"
 	"log"
 	"net/http"
 	"os"
@@ -35,13 +34,13 @@ func main() {
 	l.Println(res)
 
 	// Handlers
-	helloHandler := handlers.NewHello(l)
-	achievementHandlers := handlers.NewAchievement(l)
+	//helloHandler := handlers.NewHello(l)
+	//achievementHandlers := handlers.NewAchievement(l)
 
 	// Routing
 	gorillaMux := mux.NewRouter()
-	gorillaMux.HandleFunc("/", helloHandler.ServeHTTP)
-	gorillaMux.HandleFunc("/achievement", achievementHandlers.ServeHTTP)
+	//gorillaMux.HandleFunc("/", helloHandler.ServeHTTP)
+	//gorillaMux.HandleFunc("/achievement", achievementHandlers.ServeHTTP)
 
 	// Start server
 	http.ListenAndServe(":9090", gorillaMux)
