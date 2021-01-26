@@ -6,13 +6,14 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Ubivius/user-microservice/handlers"
 	"github.com/elastic/go-elasticsearch"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	//Logger
-	l := log.New(os.Stdout, "microservice-prototype", log.LstdFlags)
+	l := log.New(os.Stdout, "microservice-user", log.LstdFlags)
 
 	// Configuration elastic search
 	cfg := elasticsearch.Config{
@@ -26,7 +27,6 @@ func main() {
 	if err != nil {
 		l.Println("Error creating the es client.")
 	}
-
 	var b bytes.Buffer
 	b.WriteString(`{"Users" : "Jeremi"}`)
 
@@ -34,14 +34,19 @@ func main() {
 	l.Println(res)
 
 	// Handlers
-	//helloHandler := handlers.NewHello(l)
-	//achievementHandlers := handlers.NewAchievement(l)
+	userHandler := handlers.NewUser(l)
+	l.Println("handler done")
 
 	// Routing
 	gorillaMux := mux.NewRouter()
-	//gorillaMux.HandleFunc("/", helloHandler.ServeHTTP)
-	//gorillaMux.HandleFunc("/achievement", achievementHandlers.ServeHTTP)
+	gorillaMux.HandleFunc("/", userHandler.ServeHTTP)
+	l.Println("routing done")
 
 	// Start server
-	http.ListenAndServe(":9090", gorillaMux)
+	errServe := http.ListenAndServe(":9090", userHandler)
+	l.Println("Starting server on port 9090")
+	if errServe != nil {
+		l.Printf("Error starting server: %s\n", errServe)
+		os.Exit(1)
+	}
 }

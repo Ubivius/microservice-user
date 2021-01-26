@@ -3,7 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
-	"encoding/json"
+
 	"github.com/Ubivius/user-microservice/data"
 )
 
@@ -17,10 +17,9 @@ func NewUser(l *log.Logger) *User {
 
 func (u *User) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	lu := data.GetUsers()
-	d, err := json.Marshal(lu)
-	if err!=nil {
-		http.Error(rw, "Unable to marshal json",http.StatusInternalServerError)
-	}
 
-	rw.Write(d)
+	err := lu.ToJSON(rw)
+	if err != nil {
+		http.Error(rw, "Unable to marshal json", http.StatusInternalServerError)
+	}
 }
