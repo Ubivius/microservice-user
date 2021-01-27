@@ -34,12 +34,12 @@ func main() {
 	l.Println(res)
 
 	// Handlers
-	userHandler := handlers.NewUser(l)
+	userHandler := handlers.NewUsers(l)
 	l.Println("handler done")
 
 	// Routing
 	gorillaMux := mux.NewRouter()
-	gorillaMux.HandleFunc("/", userHandler.ServeHTTP)
+	gorillaMux.HandleFunc("/", userHandler.ServeHTTP).Methods("GET")
 	l.Println("routing done")
 
 	// Start server
