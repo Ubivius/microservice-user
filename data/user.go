@@ -2,6 +2,7 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 )
@@ -20,6 +21,39 @@ func GetUsers() Users {
 	return userList
 }
 
+func AddUser(u *User) {
+	u.Id = getNextID()
+	userList = append(userList, u)
+}
+
+func UpdateUser(id int, u *User) error {
+	_, pos, err := findUser(id)
+	if err != nil {
+		return err
+	}
+
+	u.Id = id
+	userList[pos] = u
+
+	return nil
+}
+
+var ErrUserNotFound = fmt.Errorf("USer not found")
+
+func findUser(id int) (*User, int, error) {
+	for i, u := range userList {
+		if u.Id == id {
+			return u, i, nil
+		}
+	}
+	return nil, -1, ErrUserNotFound
+}
+
+func getNextID() int {
+	lu := userList[len(userList)-1]
+	return lu.Id + 1
+}
+
 // ToJSON serializes the contents of the collection to JSON
 // NewEncoder provides better performance than json.Unmarshal as it does not
 // have to buffer the output into an in memory slice of bytes
@@ -31,13 +65,18 @@ func (u *Users) ToJSON(w io.Writer) error {
 	return e.Encode(u)
 }
 
+func (u *User) FromJSON(r io.Reader) error {
+	e := json.NewDecoder(r)
+	return e.Decode(u)
+}
+
 var userList = []*User{
-	&User{
+	{
 		Id:        12345,
 		Username:  "sickboy",
 		CreatedOn: time.Now().UTC().String(),
 	},
-	&User{
+	{
 		Id:        54321,
 		Username:  "Mark Renton",
 		CreatedOn: time.Now().UTC().String(),
