@@ -39,7 +39,12 @@ func main() {
 
 	// Routing
 	gorillaMux := mux.NewRouter()
-	gorillaMux.HandleFunc("/", userHandler.ServeHTTP).Methods("GET")
+
+	getRouter := gorillaMux.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/", userHandler.GetUsers)
+
+	putRouter := gorillaMux.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", userHandler.UpdateUsers)
 	l.Println("routing done")
 
 	// Start server

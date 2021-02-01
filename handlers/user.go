@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/Ubivius/user-microservice/data"
+	"github.com/gorilla/mux"
 )
 
 type Users struct {
@@ -23,7 +24,7 @@ func NewUsers(l *log.Logger) *Users {
 func (u *Users) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	// handle the request for a list of Users
 	if r.Method == http.MethodGet {
-		u.getUsers(rw, r)
+		u.GetUsers(rw, r)
 		return
 	}
 
@@ -59,16 +60,16 @@ func (u *Users) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 		u.l.Println("got id", id)
 
-		u.updateUsers(id, rw, r)
+		u.UpdateUsers(rw, r)
 	}
 
 	// catch all
 	// if no method is satisfied return an error
-	rw.WriteHeader(http.StatusMethodNotAllowed)
+	//rw.WriteHeader(http.StatusMethodNotAllowed)
 }
 
 // getProducts returns the products from the data store
-func (u *Users) getUsers(rw http.ResponseWriter, r *http.Request) {
+func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle GET Users")
 
 	// fetch the products from the datastore
@@ -95,12 +96,19 @@ func (u *Users) addUser(rw http.ResponseWriter, r *http.Request) {
 	data.AddUser(user)
 }
 
-func (u Users) updateUsers(id int, rw http.ResponseWriter, r *http.Request) {
-	u.l.Println("Handle PUT User")
+func (u Users) UpdateUsers(rw http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
+		return
+	}
+	u.l.Println("Handle PUT User", id)
 
 	user := &data.User{}
 
-	err := user.FromJSON(r.Body)
+	err = user.FromJSON(r.Body)
 	if err != nil {
 		http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
 	}

@@ -38,7 +38,7 @@ func UpdateUser(id int, u *User) error {
 	return nil
 }
 
-var ErrUserNotFound = fmt.Errorf("USer not found")
+var ErrUserNotFound = fmt.Errorf("User not found")
 
 func findUser(id int) (*User, int, error) {
 	for i, u := range userList {
