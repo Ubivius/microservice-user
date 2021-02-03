@@ -1,9 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/Ubivius/user-microservice/data"
@@ -14,6 +14,8 @@ type Users struct {
 	l *log.Logger
 }
 
+type KeyUser struct{}
+
 // NewUsers creates a products handler with the given logger
 func NewUsers(l *log.Logger) *Users {
 	return &Users{l}
@@ -21,7 +23,7 @@ func NewUsers(l *log.Logger) *Users {
 
 // ServeHTTP is the main entry point for the handler and staisfies the http.Handler
 // interface
-func (u *Users) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+/*func (u *Users) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	// handle the request for a list of Users
 	if r.Method == http.MethodGet {
 		u.GetUsers(rw, r)
@@ -29,7 +31,7 @@ func (u *Users) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		u.addUser(rw, r)
+		u.AddUser(rw, r)
 		return
 	}
 
@@ -66,7 +68,7 @@ func (u *Users) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	// catch all
 	// if no method is satisfied return an error
 	//rw.WriteHeader(http.StatusMethodNotAllowed)
-}
+}*/
 
 // getProducts returns the products from the data store
 func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
@@ -82,18 +84,11 @@ func (u *Users) GetUsers(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (u *Users) addUser(rw http.ResponseWriter, r *http.Request) {
+func (u *Users) AddUser(rw http.ResponseWriter, r *http.Request) {
 	u.l.Println("Handle POST User")
 
-	user := &data.User{}
-
-	err := user.FromJSON(r.Body)
-	if err != nil {
-		http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
-	}
-
-	u.l.Printf("User: %#v", user)
-	data.AddUser(user)
+	user := r.Context().Value(KeyUser{}).(data.User)
+	data.AddUser(&user)
 }
 
 func (u Users) UpdateUsers(rw http.ResponseWriter, r *http.Request) {
@@ -104,17 +99,11 @@ func (u Users) UpdateUsers(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "Unable to convert id", http.StatusBadRequest)
 		return
 	}
+
+	user := r.Context().Value(KeyUser{}).(data.User)
 	u.l.Println("Handle PUT User", id)
 
-	user := &data.User{}
-
-	err = user.FromJSON(r.Body)
-	if err != nil {
-		http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
-	}
-
-	u.l.Printf("User: %#v", user)
-	err = data.UpdateUser(id, user)
+	err = data.UpdateUser(id, &user)
 	if err == data.ErrUserNotFound {
 		http.Error(rw, "Product not found", http.StatusNotFound)
 		return
@@ -124,4 +113,22 @@ func (u Users) UpdateUsers(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "User not found", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (u Users) MiddlewareUserValidation(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		user := data.User{}
+
+		err := user.FromJSON(r.Body)
+		if err != nil {
+			http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), KeyUser{}, user)
+		req := r.WithContext(ctx)
+
+		next.ServeHTTP(rw, req)
+	})
 }

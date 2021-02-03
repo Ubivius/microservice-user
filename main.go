@@ -45,10 +45,14 @@ func main() {
 
 	putRouter := gorillaMux.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/{id:[0-9]+}", userHandler.UpdateUsers)
-	l.Println("routing done")
+	putRouter.Use(userHandler.MiddlewareUserValidation)
+
+	postRouter := gorillaMux.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/", userHandler.AddUser)
+	postRouter.Use(userHandler.MiddlewareUserValidation)
 
 	// Start server
-	errServe := http.ListenAndServe(":9090", userHandler)
+	errServe := http.ListenAndServe(":9090", gorillaMux)
 	l.Println("Starting server on port 9090")
 	if errServe != nil {
 		l.Printf("Error starting server: %s\n", errServe)
