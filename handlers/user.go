@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -123,6 +124,18 @@ func (u Users) MiddlewareUserValidation(next http.Handler) http.Handler {
 		err := user.FromJSON(r.Body)
 		if err != nil {
 			http.Error(rw, "Unable to unmarshal json", http.StatusBadRequest)
+			return
+		}
+
+		//validate the product
+		err = user.Validate()
+		if err != nil {
+			u.l.Println("[ERROR] validating user", err)
+			http.Error(
+				rw,
+				fmt.Sprintf("Error validating user: %s", err),
+				http.StatusBadRequest,
+			)
 			return
 		}
 
