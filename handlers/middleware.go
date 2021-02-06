@@ -12,7 +12,7 @@ import (
 func (userHandler *UsersHandler) MiddlewareUserValidation(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
-		user := data.User{}
+		user := &data.User{}
 
 		err := data.FromJSON(user, request.Body)
 		if err != nil {
