@@ -1,4 +1,4 @@
-module github.com/Ubivius/user-microservice
+module github.com/Ubivius/microservice-user
 
 go 1.15
 

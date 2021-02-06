@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/Ubivius/user-microservice/handlers"
+	"github.com/Ubivius/microservice-user/handlers"
 	"github.com/elastic/go-elasticsearch"
 	"github.com/gorilla/mux"
 )

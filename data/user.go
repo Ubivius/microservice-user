@@ -36,11 +36,13 @@ func GetUserByID(id int) (*User, error) {
 	return userList[index], nil
 }
 
+// AddUser creates a new user
 func AddUser(user *User) {
 	user.ID = getNextID()
 	userList = append(userList, user)
 }
 
+// UpdateUser updates the user specified in received JSON
 func UpdateUser(user *User) error {
 	index := findIndexByUserID(user.ID)
 	if index == -1 {
@@ -50,6 +52,21 @@ func UpdateUser(user *User) error {
 	return nil
 }
 
+// DeleteUser deletes the user with the given id
+func DeleteUser(id int) error {
+	index := findIndexByUserID(id)
+	if index == -1 {
+		return ErrorUserNotFound
+	}
+
+	// This should not work, probably needs ':' after index+1. To test
+	userList = append(userList[:index], userList[index+1])
+
+	return nil
+}
+
+// Returns the index of a user in the database
+// Returns -1 when no user is found
 func findIndexByUserID(id int) int {
 	for index, user := range userList {
 		if user.ID == id {
@@ -58,6 +75,11 @@ func findIndexByUserID(id int) int {
 	}
 	return -1
 }
+
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////// Fake database ///////////////////////////////////
+///// DB connection setup and docker file will be done in sprint 8 /////////
+///////////////////////////////////////////////////////////////////////////
 
 func getNextID() int {
 	userList := userList[len(userList)-1]

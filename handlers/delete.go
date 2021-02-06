@@ -12,7 +12,7 @@ func (userHandler *UsersHandler) Delete(responseWriter http.ResponseWriter, requ
 	userHandler.logger.Println("Handle DELETE user", id)
 
 	err := data.DeleteUser(id)
-	if err == data.ErrorProductNotFound {
+	if err == data.ErrorUserNotFound {
 		userHandler.logger.Println("[ERROR] deleting, id does not exist")
 		http.Error(responseWriter, "User not found", http.StatusNotFound)
 		return

@@ -14,7 +14,7 @@ func (userHandler *UsersHandler) MiddlewareUserValidation(next http.Handler) htt
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
 		user := data.User{}
 
-		err := user.FromJSON(request.Body)
+		err := data.FromJSON(user, request.Body)
 		if err != nil {
 			http.Error(responseWriter, "Unable to unmarshal json", http.StatusBadRequest)
 			return

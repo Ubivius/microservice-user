@@ -14,7 +14,7 @@ func (userHandler *UsersHandler) GetUsers(responseWriter http.ResponseWriter, re
 	userList := data.GetUsers()
 
 	// serialize the list to JSON
-	err := userList.ToJSON(responseWriter)
+	err := data.ToJSON(userList, responseWriter)
 	if err != nil {
 		http.Error(responseWriter, "Unable to marshal json", http.StatusInternalServerError)
 	}
@@ -26,10 +26,10 @@ func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter,
 
 	userHandler.logger.Println("[DEBUG] getting id", id)
 
-	product, err := data.GetProductByID(id)
+	product, err := data.GetUserByID(id)
 	switch err {
 	case nil:
-	case data.ErrorProductNotFound:
+	case data.ErrorUserNotFound:
 		userHandler.logger.Println("[ERROR] fetching user", err)
 		http.Error(responseWriter, "User not found", http.StatusBadRequest)
 		return
