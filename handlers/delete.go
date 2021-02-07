@@ -20,7 +20,7 @@ func (userHandler *UsersHandler) Delete(responseWriter http.ResponseWriter, requ
 
 	if err != nil {
 		userHandler.logger.Println("[ERROR] deleting user", err)
-		http.Error(responseWriter, "Erro deleting user", http.StatusInternalServerError)
+		http.Error(responseWriter, "Error deleting user", http.StatusInternalServerError)
 		return
 	}
 
