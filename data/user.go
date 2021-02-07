@@ -12,7 +12,7 @@ type User struct {
 	Email        string `json:"email" validate:"required,email"`
 	FisrtName    string `json:"firstname"`
 	Name         string `json:"name"`
-	DateOfBirth  string `json:"dateofbirth"`
+	DateOfBirth  string `json:"dateofbirth" validate:"required,dateofbirth"`
 	Gender       string `json:"gender"`
 	Address      string `json:"address"`
 	Bio          string `json:"bio"`
@@ -27,7 +27,7 @@ func GetUsers() Users {
 	return userList
 }
 
-// GetProductByID returns a single product with the given id
+// GetUserByID returns a single product with the given id
 func GetUserByID(id int) (*User, error) {
 	index := findIndexByUserID(id)
 	if id == -1 {
