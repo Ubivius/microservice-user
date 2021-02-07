@@ -8,10 +8,10 @@ import (
 
 // UpdateUsers updates the user with the ID specified in the received JSON product
 func (userHandler *UsersHandler) UpdateUsers(responseWriter http.ResponseWriter, request *http.Request) {
-	user := request.Context().Value(KeyUser{}).(data.User)
+	user := request.Context().Value(KeyUser{}).(*data.User)
 	userHandler.logger.Println("Handle PUT User", user.ID)
 
-	err := data.UpdateUser(&user)
+	err := data.UpdateUser(user)
 	if err == data.ErrorUserNotFound {
 		userHandler.logger.Println("[ERROR} user not found", err)
 		http.Error(responseWriter, "User not found", http.StatusNotFound)

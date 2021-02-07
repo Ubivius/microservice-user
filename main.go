@@ -49,7 +49,7 @@ func main() {
 
 	//Put Router
 	putRouter := router.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/{id:[0-9]+}", userHandler.UpdateUsers)
+	putRouter.HandleFunc("/users", userHandler.UpdateUsers)
 	putRouter.Use(userHandler.MiddlewareUserValidation)
 
 	//Post Router
