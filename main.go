@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"log"
 	"net/http"
@@ -10,31 +9,12 @@ import (
 	"time"
 
 	"github.com/Ubivius/microservice-user/handlers"
-	"github.com/elastic/go-elasticsearch"
 	"github.com/gorilla/mux"
 )
 
 func main() {
 	//Logger
 	logger := log.New(os.Stdout, "microservice-user", log.LstdFlags)
-
-	// Configuration elastic search
-	cfg := elasticsearch.Config{
-		Addresses: []string{
-			"http://localhost:9200",
-			"http://localhost:9201",
-		},
-	}
-
-	es, err := elasticsearch.NewClient(cfg)
-	if err != nil {
-		logger.Println("Error creating the es client.")
-	}
-	var b bytes.Buffer
-	b.WriteString(`{"Users" : "Jeremi"}`)
-
-	res, _ := es.Index("method1", &b)
-	logger.Println(res)
 
 	// Handlers
 	userHandler := handlers.NewUsersHandler(logger)
