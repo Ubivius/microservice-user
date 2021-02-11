@@ -4,8 +4,9 @@ import "testing"
 
 func TestCheckValidation(t *testing.T) {
 	u := &User{
-		Username: "sickboy",
-		Email:    "jeremi@gmail.com",
+		Username:    "JeremiS",
+		Email:       "jeremi@gmail.com",
+		DateOfBirth: "",
 	}
 
 	err := u.Validate()

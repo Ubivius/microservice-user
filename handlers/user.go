@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// UsersHandler contains the items common to all product handler functions
+// UsersHandler contains the items common to all user handler functions
 type UsersHandler struct {
 	logger *log.Logger
 }
@@ -16,12 +16,12 @@ type UsersHandler struct {
 // KeyUser is a key used for the User object inside context
 type KeyUser struct{}
 
-// NewUsers creates a products handler with the given logger
+// NewUsers creates a user handler with the given logger
 func NewUsersHandler(logger *log.Logger) *UsersHandler {
 	return &UsersHandler{logger}
 }
 
-// getProductID extracts the user ID from the URL
+// getUserID extracts the user ID from the URL
 // The verification of this variable is handled by gorilla/mux
 // We panic if it is not valid because that means gorilla is failing
 func getUserID(request *http.Request) int {

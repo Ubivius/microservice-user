@@ -10,8 +10,8 @@ type User struct {
 	ID           int    `json:"id"`
 	Username     string `json:"username" validate:"required"`
 	Email        string `json:"email" validate:"required,email"`
-	FisrtName    string `json:"firstname"`
-	Name         string `json:"name"`
+	FirstName    string `json:"firstname"`
+	LastName     string `json:"name"`
 	DateOfBirth  string `json:"dateofbirth" validate:"required,dateofbirth"`
 	Gender       string `json:"gender"`
 	Address      string `json:"address"`
@@ -88,11 +88,21 @@ func getNextID() int {
 
 var userList = []*User{
 	{
-		ID:       1,
-		Username: "sickboy",
+		ID:          1,
+		Username:    "JeremiS",
+		Email:       "jeremi@gmail.com",
+		FirstName:   "Jeremi",
+		LastName:    "Savard",
+		DateOfBirth: "08/02/1996",
+		Gender:      "M",
 	},
 	{
-		ID:       2,
-		Username: "Mark Renton",
+		ID:          2,
+		Username:    "MalcolmSJ",
+		Email:       "malcolmb@gmail.com",
+		FirstName:   "Malcolm",
+		LastName:    "St-John",
+		DateOfBirth: "01/01/1994",
+		Gender:      "M",
 	},
 }
