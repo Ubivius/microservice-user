@@ -3,7 +3,6 @@ Microservice to manage users.
 
 Beginning of code was based off of Nic Jackson's building microservices in Go : https://www.youtube.com/playlist?list=PLmD8u-IFdreyh6EUfevBcbiuCKzFk0EW_
 
-***Endpoints***
 
 **Get Users**
 ----
