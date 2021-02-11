@@ -16,7 +16,7 @@ type UsersHandler struct {
 // KeyUser is a key used for the User object inside context
 type KeyUser struct{}
 
-// NewUsers creates a user handler with the given logger
+// NewUsersHandler creates a user handler with the given logger
 func NewUsersHandler(logger *log.Logger) *UsersHandler {
 	return &UsersHandler{logger}
 }

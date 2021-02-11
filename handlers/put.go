@@ -19,7 +19,7 @@ func (userHandler *UsersHandler) UpdateUsers(responseWriter http.ResponseWriter,
 	}
 
 	if err != nil {
-		http.Error(responseWriter, "User not found", http.StatusInternalServerError)
+		http.Error(responseWriter, "Update user failed", http.StatusInternalServerError)
 		return
 	}
 
