@@ -8,14 +8,11 @@ import (
 
 func (user *User) Validate() error {
 	validate := validator.New()
-	err := validate.RegisterValidation("email", validateEmail)
-	if err != nil {
-		panic(err)
-	}
+	err1 := validate.RegisterValidation("email", validateEmail)
 
-	err = validate.RegisterValidation("dateofbirth", validateDateOfBirth)
-	if err != nil {
-		panic(err)
+	err2 := validate.RegisterValidation("dateofbirth", validateDateOfBirth)
+	if err1 != nil || err2 != nil {
+		panic("Validator connexions failed")
 	}
 	return validate.Struct(user)
 }
