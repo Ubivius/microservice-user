@@ -10,12 +10,12 @@ func (user *User) Validate() error {
 	validate := validator.New()
 	err := validate.RegisterValidation("email", validateEmail)
 	if err != nil {
-		//do something
+		panic(err)
 	}
 
 	err = validate.RegisterValidation("dateofbirth", validateDateOfBirth)
 	if err != nil {
-		//do something
+		panic(err)
 	}
 	return validate.Struct(user)
 }
