@@ -27,7 +27,7 @@ func GetUsers() Users {
 	return userList
 }
 
-// GetUserByID returns a single product with the given id
+// GetUserByID returns a single user with the given id
 func GetUserByID(id int) (*User, error) {
 	index := findIndexByUserID(id)
 	if id == -1 {

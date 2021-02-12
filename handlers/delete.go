@@ -6,7 +6,7 @@ import (
 	"github.com/Ubivius/microservice-user/data"
 )
 
-// Delete a product with specified id from the database
+// Delete a user with specified id from the database
 func (userHandler *UsersHandler) Delete(responseWriter http.ResponseWriter, request *http.Request) {
 	id := getUserID(request)
 	userHandler.logger.Println("Handle DELETE user", id)

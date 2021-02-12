@@ -8,7 +8,7 @@ import (
 	"github.com/Ubivius/microservice-user/data"
 )
 
-// MiddlewareProductValidation is used to validate incoming product JSONS
+// MiddlewareUserValidation is used to validate incoming user JSONS
 func (userHandler *UsersHandler) MiddlewareUserValidation(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
@@ -20,7 +20,7 @@ func (userHandler *UsersHandler) MiddlewareUserValidation(next http.Handler) htt
 			return
 		}
 
-		//validate the product
+		//validate the user
 		err = user.Validate()
 		if err != nil {
 			userHandler.logger.Println("[ERROR] validating user", err)

@@ -6,7 +6,7 @@ import (
 	"github.com/Ubivius/microservice-user/data"
 )
 
-// UpdateUsers updates the user with the ID specified in the received JSON product
+// UpdateUsers updates the user with the ID specified in the received JSON user
 func (userHandler *UsersHandler) UpdateUsers(responseWriter http.ResponseWriter, request *http.Request) {
 	user := request.Context().Value(KeyUser{}).(*data.User)
 	userHandler.logger.Println("Handle PUT User", user.ID)

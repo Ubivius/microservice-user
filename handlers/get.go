@@ -6,11 +6,11 @@ import (
 	"github.com/Ubivius/microservice-user/data"
 )
 
-// GetProducts returns the full list of users
+// GetUsers returns the full list of users
 func (userHandler *UsersHandler) GetUsers(responseWriter http.ResponseWriter, request *http.Request) {
 	userHandler.logger.Println("Handle GET Users")
 
-	// fetch the products from the datastore
+	// fetch the users from the datastore
 	userList := data.GetUsers()
 
 	// serialize the list to JSON
@@ -26,7 +26,7 @@ func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter,
 
 	userHandler.logger.Println("[DEBUG] getting id", id)
 
-	product, err := data.GetUserByID(id)
+	user, err := data.GetUserByID(id)
 	switch err {
 	case nil:
 	case data.ErrorUserNotFound:
@@ -39,7 +39,7 @@ func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter,
 		return
 	}
 
-	err = data.ToJSON(product, responseWriter)
+	err = data.ToJSON(user, responseWriter)
 	if err != nil {
 		userHandler.logger.Println("[ERROR] serializing user", err)
 	}
