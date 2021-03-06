@@ -30,7 +30,7 @@ func GetUsers() Users {
 // GetUserByID returns a single user with the given id
 func GetUserByID(id int) (*User, error) {
 	index := findIndexByUserID(id)
-	if id == -1 {
+	if index == -1 {
 		return nil, ErrorUserNotFound
 	}
 	return userList[index], nil
