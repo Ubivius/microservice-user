@@ -12,4 +12,5 @@ func (userHandler *UsersHandler) AddUser(responseWriter http.ResponseWriter, req
 
 	user := request.Context().Value(KeyUser{}).(*data.User)
 	data.AddUser(user)
+	responseWriter.WriteHeader(http.StatusNoContent)
 }
