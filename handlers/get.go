@@ -43,9 +43,4 @@ func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter,
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	err = data.ToJSON(user, responseWriter)
-	if err != nil {
-		userHandler.logger.Println("[ERROR] serializing user", err)
-	}
 }
