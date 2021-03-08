@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/Ubivius/microservice-user/data"
@@ -29,6 +30,10 @@ func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter,
 	user, err := data.GetUserByID(id)
 	switch err {
 	case nil:
+		err = json.NewEncoder(responseWriter).Encode(user)
+		if err != nil {
+			userHandler.logger.Println("[ERROR] serializing user", err)
+		}
 	case data.ErrorUserNotFound:
 		userHandler.logger.Println("[ERROR] fetching user", err)
 		http.Error(responseWriter, "User not found", http.StatusBadRequest)
@@ -37,10 +42,5 @@ func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter,
 		userHandler.logger.Println("[ERROR] fetching user", err)
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
-	}
-
-	err = data.ToJSON(user, responseWriter)
-	if err != nil {
-		userHandler.logger.Println("[ERROR] serializing user", err)
 	}
 }
