@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/Ubivius/microservice-user/handlers"
+	"github.com/Ubivius/microservice-user/pkg/handlers"
 	"github.com/Ubivius/microservice-user/pkg/router"
 )
 
