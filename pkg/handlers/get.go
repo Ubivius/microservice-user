@@ -15,7 +15,7 @@ func (userHandler *UsersHandler) GetUsers(responseWriter http.ResponseWriter, re
 	userList := data.GetUsers()
 
 	// serialize the list to JSON
-	err := data.ToJSON(userList, responseWriter)
+	err := json.NewEncoder(responseWriter).Encode(userList)
 	if err != nil {
 		http.Error(responseWriter, "Unable to marshal json", http.StatusInternalServerError)
 	}

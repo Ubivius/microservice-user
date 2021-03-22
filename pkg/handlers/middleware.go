@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -14,7 +15,7 @@ func (userHandler *UsersHandler) MiddlewareUserValidation(next http.Handler) htt
 	return http.HandlerFunc(func(responseWriter http.ResponseWriter, request *http.Request) {
 		user := &data.User{}
 
-		err := data.FromJSON(user, request.Body)
+		err := json.NewDecoder(request.Body).Decode(user)
 		if err != nil {
 			http.Error(responseWriter, "Unable to unmarshal json", http.StatusBadRequest)
 			return
