@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/Ubivius/microservice-user/data"
+	"github.com/Ubivius/microservice-user/pkg/data"
 )
 
 // UpdateUsers updates the user with the ID specified in the received JSON user

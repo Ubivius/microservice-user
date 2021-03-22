@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Ubivius/microservice-user/data"
+	"github.com/Ubivius/microservice-user/pkg/data"
 )
 
 // GetUsers returns the full list of users

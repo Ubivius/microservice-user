@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Ubivius/microservice-user/data"
+	"github.com/Ubivius/microservice-user/pkg/data"
 )
 
 // MiddlewareUserValidation is used to validate incoming user JSONS

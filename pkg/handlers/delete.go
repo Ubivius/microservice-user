@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/Ubivius/microservice-user/data"
+	"github.com/Ubivius/microservice-user/pkg/data"
 )
 
 // Delete a user with specified id from the database
