@@ -9,20 +9,20 @@ import (
 // UpdateUsers updates the user with the ID specified in the received JSON user
 func (userHandler *UsersHandler) UpdateUsers(responseWriter http.ResponseWriter, request *http.Request) {
 	user := request.Context().Value(KeyUser{}).(*data.User)
-	userHandler.logger.Println("Handle PUT User", user.ID)
+	log.Info("UpdateUsers request", "id", user.ID)
 
-	err := data.UpdateUser(user)
-	if err == data.ErrorUserNotFound {
-		userHandler.logger.Println("[ERROR} user not found", err)
+	err := userHandler.db.UpdateUser(user)
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	case data.ErrorUserNotFound:
+		log.Error(err, "User not found")
 		http.Error(responseWriter, "User not found", http.StatusNotFound)
 		return
-	}
-
-	if err != nil {
-		http.Error(responseWriter, "Update user failed", http.StatusInternalServerError)
+	default:
+		log.Error(err, "Error updating user")
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// Returns status, no content required
-	responseWriter.WriteHeader(http.StatusNoContent)
 }
