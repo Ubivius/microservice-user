@@ -10,12 +10,13 @@ import (
 // Mux route handling with gorilla/mux
 func New(userHandler *handlers.UsersHandler) *mux.Router {
 	// Mux route handling with gorilla/mux
+	log.Info("Starting router")
 	router := mux.NewRouter()
 
 	//Get Router
 	getRouter := router.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/users", userHandler.GetUsers)
-	getRouter.HandleFunc("/users/{id:[0-9]+}", userHandler.GetUserByID)
+	getRouter.HandleFunc("/users/{id:[0-9a-z-]+}", userHandler.GetUserByID)
 
 	//Put Router
 	putRouter := router.Methods(http.MethodPut).Subrouter()
@@ -29,7 +30,7 @@ func New(userHandler *handlers.UsersHandler) *mux.Router {
 
 	// Delete router
 	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
-	deleteRouter.HandleFunc("/users/{id:[0-9]+}", userHandler.Delete)
+	deleteRouter.HandleFunc("/users/{id:[0-9a-z-]+}", userHandler.Delete)
 
 	return router
 }
