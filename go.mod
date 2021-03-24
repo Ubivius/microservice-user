@@ -11,6 +11,7 @@ require (
 	github.com/prometheus/common v0.10.0
 	go.mongodb.org/mongo-driver v1.5.0
 	go.opentelemetry.io/otel/exporters/stdout v0.19.0
+	go.opentelemetry.io/otel/sdk v0.19.0
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	sigs.k8s.io/controller-runtime v0.8.3
 )

@@ -8,14 +8,16 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/Ubivius/microservice-user/pkg/database"
 	"github.com/Ubivius/microservice-user/pkg/handlers"
 	"github.com/Ubivius/microservice-user/pkg/router"
 	"go.opentelemetry.io/otel/exporters/stdout"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
-var log = logf.Log.WithName("achievements-main")
+var log = logf.Log.WithName("users-main")
 
 func main() {
 	// Starting k8s logger
