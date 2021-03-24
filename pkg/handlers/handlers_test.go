@@ -14,7 +14,7 @@ import (
 )
 
 // Move to util package in Sprint 9, should be a testing specific logger
-func newUserDB() *database.UserDB {
+func newUserDB() database.UserDB {
 	return database.NewMockUsers()
 }
 

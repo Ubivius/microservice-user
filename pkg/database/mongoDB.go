@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"os"
-	"time"
 
 	"github.com/Ubivius/microservice-user/pkg/data"
 	"github.com/google/uuid"
@@ -65,7 +64,7 @@ func (mp *MongoUsers) CloseDB() {
 
 func (mp *MongoUsers) GetUsers() data.Users {
 	// Users will hold the array of Users
-	var Users data.Users
+	var users data.Users
 
 	// Find returns a cursor that must be iterated through
 	cursor, err := mp.collection.Find(context.TODO(), bson.D{})
@@ -80,7 +79,7 @@ func (mp *MongoUsers) GetUsers() data.Users {
 		if err != nil {
 			log.Error(err, "Error decoding User from database")
 		}
-		Users = append(Users, &result)
+		users = append(users, &result)
 	}
 
 	if err := cursor.Err(); err != nil {
@@ -90,7 +89,7 @@ func (mp *MongoUsers) GetUsers() data.Users {
 	// Close the cursor once finished
 	cursor.Close(context.TODO())
 
-	return Users
+	return users
 }
 
 func (mp *MongoUsers) GetUserByID(id string) (*data.User, error) {
@@ -108,9 +107,6 @@ func (mp *MongoUsers) GetUserByID(id string) (*data.User, error) {
 }
 
 func (mp *MongoUsers) UpdateUser(User *data.User) error {
-	// Set updated timestamp in User
-	User.UpdatedOn = time.Now().UTC().String()
-
 	// MongoDB search filter
 	filter := bson.D{{Key: "_id", Value: User.ID}}
 
@@ -128,9 +124,6 @@ func (mp *MongoUsers) UpdateUser(User *data.User) error {
 
 func (mp *MongoUsers) AddUser(User *data.User) error {
 	User.ID = uuid.NewString()
-	// Adding time information to new User
-	User.CreatedOn = time.Now().UTC().String()
-	User.UpdatedOn = time.Now().UTC().String()
 
 	// Inserting the new User into the database
 	insertResult, err := mp.collection.InsertOne(context.TODO(), User)

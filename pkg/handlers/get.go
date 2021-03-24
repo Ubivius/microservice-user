@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/Ubivius/microservice-user/pkg/data"
-	"github.com/prometheus/common/log"
 )
 
 // GetUsers returns the full list of users
