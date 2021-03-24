@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/Ubivius/microservice-user/pkg/data"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -123,8 +122,6 @@ func (mp *MongoUsers) UpdateUser(User *data.User) error {
 }
 
 func (mp *MongoUsers) AddUser(User *data.User) error {
-	User.ID = uuid.NewString()
-
 	// Inserting the new User into the database
 	insertResult, err := mp.collection.InsertOne(context.TODO(), User)
 	if err != nil {
