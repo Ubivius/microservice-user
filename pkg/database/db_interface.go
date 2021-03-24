@@ -6,7 +6,7 @@ import (
 
 // The interface that any kind of database must implement
 type UserDB interface {
-	GetUsers() data.User
+	GetUsers() data.Users
 	GetUserByID(id string) (*data.User, error)
 	UpdateUser(user *data.User) error
 	AddUser(user *data.User) error
