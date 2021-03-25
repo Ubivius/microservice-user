@@ -171,14 +171,14 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestDeleteExistingUser(t *testing.T) {
-	request := httptest.NewRequest(http.MethodDelete, "/users/1", nil)
+	request := httptest.NewRequest(http.MethodDelete, "/users/a2181017-5c53-422b-b6bc-036b27c04fc8", nil)
 	response := httptest.NewRecorder()
 
 	userHandler := NewUsersHandler(newUserDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
-		"id": "1",
+		"id": "a2181017-5c53-422b-b6bc-036b27c04fc8",
 	}
 	request = mux.SetURLVars(request, vars)
 
