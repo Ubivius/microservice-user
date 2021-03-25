@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/Ubivius/microservice-user/handlers"
-	"github.com/gorilla/mux"
+	"github.com/Ubivius/microservice-user/pkg/handlers"
+	"github.com/Ubivius/microservice-user/pkg/router"
 )
 
 func main() {
@@ -19,33 +19,13 @@ func main() {
 	// Handlers
 	userHandler := handlers.NewUsersHandler(logger)
 
-	// Mux route handling with gorilla/mux
-	router := mux.NewRouter()
+	// Router setup
+	r := router.New(userHandler)
 
-	//Get Router
-	getRouter := router.Methods(http.MethodGet).Subrouter()
-	getRouter.HandleFunc("/users", userHandler.GetUsers)
-	getRouter.HandleFunc("/users/{id:[0-9]+}", userHandler.GetUserByID)
-
-	//Put Router
-	putRouter := router.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/users", userHandler.UpdateUsers)
-	putRouter.Use(userHandler.MiddlewareUserValidation)
-
-	//Post Router
-	postRouter := router.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/users", userHandler.AddUser)
-	postRouter.Use(userHandler.MiddlewareUserValidation)
-
-	// Delete router
-	deleteRouter := router.Methods(http.MethodDelete).Subrouter()
-	deleteRouter.HandleFunc("/users/{id:[0-9]+}", userHandler.Delete)
-
-	// Start server
 	// Server setup
 	server := &http.Server{
 		Addr:        ":9090",
-		Handler:     router,
+		Handler:     r,
 		IdleTimeout: 120 * time.Second,
 		ReadTimeout: 1 * time.Second,
 	}

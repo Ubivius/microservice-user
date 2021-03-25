@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Ubivius/microservice-user/data"
+	"github.com/Ubivius/microservice-user/pkg/data"
 	"github.com/gorilla/mux"
 )
 
