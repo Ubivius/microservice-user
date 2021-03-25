@@ -22,7 +22,6 @@ func NewUsersHandler(db database.UserDB) *UsersHandler {
 
 // getUserID extracts the user ID from the URL
 // The verification of this variable is handled by gorilla/mux
-// We panic if it is not valid because that means gorilla is failing
 func getUserID(request *http.Request) string {
 	vars := mux.Vars(request)
 	id := vars["id"]
