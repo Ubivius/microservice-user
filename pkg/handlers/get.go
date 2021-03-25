@@ -35,7 +35,7 @@ func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter,
 		return
 	case data.ErrorUserNotFound:
 		log.Error(err, "User not found")
-		http.Error(responseWriter, "user not found", http.StatusBadRequest)
+		http.Error(responseWriter, "User not found", http.StatusBadRequest)
 		return
 	default:
 		log.Error(err, "Error getting user")

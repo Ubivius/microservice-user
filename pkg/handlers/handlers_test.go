@@ -56,7 +56,7 @@ func TestGetExistingUserByID(t *testing.T) {
 }
 
 func TestGetNonExistingUserByID(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, "/users/4", nil)
+	request := httptest.NewRequest(http.MethodGet, "/users/a2181017-5c53-422b-b6bc-036b27c04fc8", nil)
 	response := httptest.NewRecorder()
 
 	userHandler := NewUsersHandler(newUserDB())
