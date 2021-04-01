@@ -60,7 +60,7 @@ func (mp *MockUsers) DeleteUser(id string) error {
 	}
 
 	// This should not work, probably needs ':' after index+1. To test
-	userList = append(userList[:index], userList[index+1])
+	userList = append(userList[:index], userList[index+1:]...)
 
 	return nil
 }
