@@ -46,7 +46,7 @@ func (mp *MongoUsers) Connect() error {
 
 	log.Info("Connection to MongoDB established")
 
-	collection := client.Database("test").Collection("Users")
+	collection := client.Database("ubivius").Collection("Users")
 
 	// Assign client and collection to the MongoUsers struct
 	mp.collection = collection
