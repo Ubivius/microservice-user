@@ -12,7 +12,7 @@ type User struct {
 	Email        string `json:"email" validate:"required,email"`
 	FirstName    string `json:"firstname"`
 	LastName     string `json:"name"`
-	DateOfBirth  string `json:"dateofbirth" validate:"required,dateofbirth"`
+	DateOfBirth  string `json:"dateofbirth"`
 	Gender       string `json:"gender"`
 	Address      string `json:"address"`
 	Bio          string `json:"bio"`
