@@ -9,14 +9,11 @@ import (
 
 // GetUsers returns the full list of users
 func (userHandler *UsersHandler) GetUsers(responseWriter http.ResponseWriter, request *http.Request) {
-	userHandler.logger.Println("Handle GET Users")
-
-	// fetch the users from the datastore
-	userList := data.GetUsers()
-
-	// serialize the list to JSON
+	log.Info("GetUsers request")
+	userList := userHandler.db.GetUsers()
 	err := json.NewEncoder(responseWriter).Encode(userList)
 	if err != nil {
+		log.Error(err, "Error serializing user")
 		http.Error(responseWriter, "Unable to marshal json", http.StatusInternalServerError)
 	}
 }
@@ -25,21 +22,23 @@ func (userHandler *UsersHandler) GetUsers(responseWriter http.ResponseWriter, re
 func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter, request *http.Request) {
 	id := getUserID(request)
 
-	userHandler.logger.Println("[DEBUG] getting id", id)
+	log.Info("GetUserByID request", "id", id)
 
-	user, err := data.GetUserByID(id)
+	user, err := userHandler.db.GetUserByID(id)
+
 	switch err {
 	case nil:
 		err = json.NewEncoder(responseWriter).Encode(user)
 		if err != nil {
-			userHandler.logger.Println("[ERROR] serializing user", err)
+			log.Error(err, "Error serializing user")
 		}
+		return
 	case data.ErrorUserNotFound:
-		userHandler.logger.Println("[ERROR] fetching user", err)
+		log.Error(err, "User not found")
 		http.Error(responseWriter, "User not found", http.StatusBadRequest)
 		return
 	default:
-		userHandler.logger.Println("[ERROR] fetching user", err)
+		log.Error(err, "Error getting user")
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -8,9 +8,18 @@ import (
 
 // AddUser creates a new user from the received JSON
 func (userHandler *UsersHandler) AddUser(responseWriter http.ResponseWriter, request *http.Request) {
-	userHandler.logger.Println("Handle POST User")
+	log.Info("AddUser request")
 
 	user := request.Context().Value(KeyUser{}).(*data.User)
-	data.AddUser(user)
-	responseWriter.WriteHeader(http.StatusNoContent)
+	err := userHandler.db.AddUser(user)
+
+	switch err {
+	case nil:
+		responseWriter.WriteHeader(http.StatusNoContent)
+		return
+	default:
+		log.Error(err, "Error adding user")
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

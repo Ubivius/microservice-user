@@ -17,6 +17,7 @@ func (userHandler *UsersHandler) MiddlewareUserValidation(next http.Handler) htt
 
 		err := json.NewDecoder(request.Body).Decode(user)
 		if err != nil {
+			log.Error(err, "Error deserializing user")
 			http.Error(responseWriter, "Unable to unmarshal json", http.StatusBadRequest)
 			return
 		}
@@ -24,7 +25,7 @@ func (userHandler *UsersHandler) MiddlewareUserValidation(next http.Handler) htt
 		//validate the user
 		err = user.Validate()
 		if err != nil {
-			userHandler.logger.Println("[ERROR] validating user", err)
+			log.Error(err, "Error validating user")
 			http.Error(
 				responseWriter,
 				fmt.Sprintf("Error validating user: %s", err),
