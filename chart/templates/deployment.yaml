@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       {{- include "microservice-user.selectorLabels" . | nindent 6 }}
-  user:
+  template:
     metadata:
       labels:
         {{- include "microservice-user.selectorLabels" . | nindent 8 }}

@@ -11,8 +11,8 @@ metadata:
   name: {{ $fullName }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ user "microservice-user.name" . }}
-    chart: {{ user "microservice-user.chart" . }}
+    app: {{ template "microservice-user.name" . }}
+    chart: {{ template "microservice-user.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
   {{- with .Values.ingress.annotations }}
