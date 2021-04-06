@@ -12,5 +12,6 @@ type UserDB interface {
 	AddUser(user *data.User) error
 	DeleteUser(id string) error
 	Connect() error
+	PingDB() error
 	CloseDB()
 }
