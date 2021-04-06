@@ -11,7 +11,7 @@ type User struct {
 	Username     string `json:"username" validate:"required"`
 	Email        string `json:"email" validate:"required,email"`
 	FirstName    string `json:"firstname"`
-	LastName     string `json:"name"`
+	LastName     string `json:"lastname"`
 	DateOfBirth  string `json:"dateofbirth"`
 	Gender       string `json:"gender"`
 	Address      string `json:"address"`
