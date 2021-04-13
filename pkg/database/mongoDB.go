@@ -54,6 +54,10 @@ func (mp *MongoUsers) Connect() error {
 	return nil
 }
 
+func (mp *MongoUsers) PingDB() error {
+	return mp.client.Ping(context.TODO(), nil)
+}
+
 func (mp *MongoUsers) CloseDB() {
 	err := mp.client.Disconnect(context.TODO())
 	if err != nil {

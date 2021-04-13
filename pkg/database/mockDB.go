@@ -17,6 +17,10 @@ func (mp *MockUsers) Connect() error {
 	return nil
 }
 
+func (mp *MockUsers) PingDB() error {
+	return nil
+}
+
 func (mp *MockUsers) CloseDB() {
 	log.Info("Mocked DB connection closed")
 }
