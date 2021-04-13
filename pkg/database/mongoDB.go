@@ -5,18 +5,20 @@ import (
 	"os"
 
 	"github.com/Ubivius/microservice-user/pkg/data"
+	"github.com/Ubivius/microservice-user/pkg/resources"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type MongoUsers struct {
-	client     *mongo.Client
-	collection *mongo.Collection
+	client           *mongo.Client
+	collection       *mongo.Collection
+	resourceManager  resources.ResourceManager
 }
 
-func NewMongoUsers() UserDB {
-	mp := &MongoUsers{}
+func NewMongoUsers(r resources.ResourceManager) UserDB {
+	mp := &MongoUsers{resourceManager: r}
 	err := mp.Connect()
 	// If connect fails, kill the program
 	if err != nil {
@@ -27,8 +29,15 @@ func NewMongoUsers() UserDB {
 }
 
 func (mp *MongoUsers) Connect() error {
+	// Getting mongodb secret
+	password, err := mp.resourceManager.GetSecret("default", "mongodb", "mongodb-root-password")
+	if err != nil {
+		log.Error(err, "Failed to get mongodb secret")
+		os.Exit(1)
+	}
+
 	// Setting client options
-	clientOptions := options.Client().ApplyURI("mongodb://admin:pass@localhost:27888/?authSource=admin")
+	clientOptions := options.Client().ApplyURI("mongodb://root:" + password + "@mongodb:27017/?authSource=admin")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
@@ -46,7 +55,7 @@ func (mp *MongoUsers) Connect() error {
 
 	log.Info("Connection to MongoDB established")
 
-	collection := client.Database("ubivius").Collection("Users")
+	collection := client.Database("ubivius").Collection("users")
 
 	// Assign client and collection to the MongoUsers struct
 	mp.collection = collection
