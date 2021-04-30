@@ -1,119 +1,48 @@
 # microservice-user
+
 Microservice to manage users.
 
-Beginning of code was based off of Nic Jackson's building microservices in Go : https://www.youtube.com/playlist?list=PLmD8u-IFdreyh6EUfevBcbiuCKzFk0EW_
+## User endpoints
 
+`GET` `/users` Returns json data about every user.
 
-**Get Users**
-----
-  Returns json data about every user.
+`GET` `/users/{id}` Returns json data about a specific user. `id=[string]`
 
-* **URL**
+`GET` `/health/live` Returns a Status OK when live.
 
-  /users
+`GET` `/health/ready` Returns a Status OK when ready or an error when dependencies are not available.
 
-* **Method:**
+`POST` `/users` Add new user with specific data.</br>
+__Data Params__
+```json
+{
+  "id":          "string",
+  "username":    "string, required",
+  "email":       "string, required",
+  "dateofbirth": "string, required",
+  "firstname":   "string",
+  "lastname":    "string",
+  "gender":      "string",
+  "address":     "string",
+  "bio":         "string"
+}
+```
 
-  `GET`
-  
-*  **URL Params**
+`PUT` `/users` Update user data. </br>
+__Data Params__
+```json
+{
+  "id":           "string, required",
+  "username":     "string",
+  "email":        "string",
+  "dateofbirth":  "string",
+  "firstname":    "string",
+  "lastname":     "string",
+  "gender":       "string",
+  "address":      "string",
+  "bio":          "string",
+  "achievements": ["string"]
+}
+```
 
-  None
-
-* **Data Params**
-
-  None
-
-
-**Get User By Id**
-----
-  Returns json data about a specific user.
-
-* **URL**
-
-  /users/:id
-
-* **Method:**
-
-  `GET`
-  
-*  **URL Params**
-
-   **Required:**
- 
-   `id=[integer]`
-
-* **Data Params**
-
-  None
-
-
-**Add new user**
-----
-  Add new user with specific data
-
-* **URL**
-
-  /users
-
-* **Method:**
-
-  `POST`
-  
-*  **URL Params**
- 
-  None
-
-* **Data Params**
-
-  **Required:**
-
-  `username=[string]`
-  `email=[string]`
-  `dateofbirth=[string]`
-
-
-**Update user**
-----
-  Update user data
-
-* **URL**
-
-  /users
-
-* **Method:**
-
-  `PUT`
-  
-*  **URL Params**
- 
-  None
-
-* **Data Params**
-
-  **Required:**
-
-  `id=[integer]`
-
-
-**Delete user**
-----
-  Delete user
-
-* **URL**
-
-  /users/:id
-
-* **Method:**
-
-  `DELETE`
-  
-*  **URL Params**
- 
-  **Required:**
- 
-   `id=[integer]`
-
-* **Data Params**
-
-  None
+`DELETE` `/users/{id}` Delete user. `id=[string]`

@@ -2,33 +2,33 @@ package handlers
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
-	"github.com/Ubivius/microservice-user/data"
+	"github.com/Ubivius/microservice-user/pkg/data"
+	"github.com/Ubivius/microservice-user/pkg/database"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
 // Move to util package in Sprint 9, should be a testing specific logger
-func NewTestLogger() *log.Logger {
-	return log.New(os.Stdout, "Tests", log.LstdFlags)
+func newUserDB() database.UserDB {
+	return database.NewMockUsers()
 }
 
 func TestGetUsers(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/users", nil)
 	response := httptest.NewRecorder()
 
-	userHandler := NewUsersHandler(NewTestLogger())
+	userHandler := NewUsersHandler(newUserDB())
 	userHandler.GetUsers(response, request)
 
 	if response.Code != 200 {
 		t.Errorf("Expected status code 200 but got : %d", response.Code)
 	}
-	if !strings.Contains(response.Body.String(), "\"id\":2") {
+	if !strings.Contains(response.Body.String(), "a2181017-5c53-422b-b6bc-036b27c04fc8") || !strings.Contains(response.Body.String(), "e2382ea2-b5fa-4506-aa9d-d338aa52af44") {
 		t.Error("Missing elements from expected results")
 	}
 }
@@ -37,11 +37,11 @@ func TestGetExistingUserByID(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/users/1", nil)
 	response := httptest.NewRecorder()
 
-	userHandler := NewUsersHandler(NewTestLogger())
+	userHandler := NewUsersHandler(newUserDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
-		"id": "1",
+		"id": "a2181017-5c53-422b-b6bc-036b27c04fc8",
 	}
 	request = mux.SetURLVars(request, vars)
 
@@ -50,20 +50,20 @@ func TestGetExistingUserByID(t *testing.T) {
 	if response.Code != http.StatusOK {
 		t.Errorf("Expected status code %d but got : %d", http.StatusOK, response.Code)
 	}
-	if !strings.Contains(response.Body.String(), "\"id\":1") {
+	if !strings.Contains(response.Body.String(), "a2181017-5c53-422b-b6bc-036b27c04fc8") {
 		t.Error("Missing elements from expected results")
 	}
 }
 
 func TestGetNonExistingUserByID(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, "/users/4", nil)
+	request := httptest.NewRequest(http.MethodGet, "/users/a2181017-5c53-422b-b6bc-036b27c04fc8", nil)
 	response := httptest.NewRecorder()
 
-	userHandler := NewUsersHandler(NewTestLogger())
+	userHandler := NewUsersHandler(newUserDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
-		"id": "4",
+		"id": uuid.NewString(),
 	}
 	request = mux.SetURLVars(request, vars)
 
@@ -81,7 +81,7 @@ func TestDeleteNonExistantUser(t *testing.T) {
 	request := httptest.NewRequest(http.MethodDelete, "/users/4", nil)
 	response := httptest.NewRecorder()
 
-	userHandler := NewUsersHandler(NewTestLogger())
+	userHandler := NewUsersHandler(newUserDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
@@ -101,6 +101,7 @@ func TestDeleteNonExistantUser(t *testing.T) {
 func TestAddUser(t *testing.T) {
 	// Creating request body
 	body := &data.User{
+		ID:          uuid.NewString(),
 		Username:    "player",
 		Email:       "player@gmail.com",
 		DateOfBirth: "01/01/1970",
@@ -113,7 +114,7 @@ func TestAddUser(t *testing.T) {
 	ctx := context.WithValue(request.Context(), KeyUser{}, body)
 	request = request.WithContext(ctx)
 
-	userHandler := NewUsersHandler(NewTestLogger())
+	userHandler := NewUsersHandler(newUserDB())
 	userHandler.AddUser(response, request)
 
 	if response.Code != http.StatusNoContent {
@@ -124,6 +125,7 @@ func TestAddUser(t *testing.T) {
 func TestUpdateNonExistantUser(t *testing.T) {
 	// Creating request body
 	body := &data.User{
+		ID:          uuid.NewString(),
 		Username:    "player",
 		Email:       "player@gmail.com",
 		DateOfBirth: "01/01/1970",
@@ -136,7 +138,7 @@ func TestUpdateNonExistantUser(t *testing.T) {
 	ctx := context.WithValue(request.Context(), KeyUser{}, body)
 	request = request.WithContext(ctx)
 
-	userHandler := NewUsersHandler(NewTestLogger())
+	userHandler := NewUsersHandler(newUserDB())
 	userHandler.UpdateUsers(response, request)
 
 	if response.Code != http.StatusNotFound {
@@ -147,7 +149,7 @@ func TestUpdateNonExistantUser(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	// Creating request body
 	body := &data.User{
-		ID:          1,
+		ID:          "a2181017-5c53-422b-b6bc-036b27c04fc8",
 		Username:    "player",
 		Email:       "player@gmail.com",
 		DateOfBirth: "01/01/1970",
@@ -160,7 +162,7 @@ func TestUpdateUser(t *testing.T) {
 	ctx := context.WithValue(request.Context(), KeyUser{}, body)
 	request = request.WithContext(ctx)
 
-	userHandler := NewUsersHandler(NewTestLogger())
+	userHandler := NewUsersHandler(newUserDB())
 	userHandler.UpdateUsers(response, request)
 
 	if response.Code != http.StatusNoContent {
@@ -169,14 +171,14 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestDeleteExistingUser(t *testing.T) {
-	request := httptest.NewRequest(http.MethodDelete, "/users/1", nil)
+	request := httptest.NewRequest(http.MethodDelete, "/users/a2181017-5c53-422b-b6bc-036b27c04fc8", nil)
 	response := httptest.NewRecorder()
 
-	userHandler := NewUsersHandler(NewTestLogger())
+	userHandler := NewUsersHandler(newUserDB())
 
 	// Mocking gorilla/mux vars
 	vars := map[string]string{
-		"id": "1",
+		"id": "a2181017-5c53-422b-b6bc-036b27c04fc8",
 	}
 	request = mux.SetURLVars(request, vars)
 
