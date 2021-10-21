@@ -4,20 +4,15 @@ import (
 	"testing"
 
 	"github.com/Ubivius/microservice-user/pkg/data"
-	"github.com/Ubivius/microservice-user/pkg/resources"
 	"github.com/google/uuid"
 )
-
-func newResourceManager() resources.ResourceManager {
-	return resources.NewMockResources()
-}
 
 func TestMongoDBConnectionAndShutdownIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Test skipped during unit tests")
 	}
 
-	mp := NewMongoUsers(newResourceManager())
+	mp := NewMongoUsers()
 	if mp == nil {
 		t.Fail()
 	}
@@ -36,7 +31,7 @@ func TestMongoDBAddUserIntegration(t *testing.T) {
 		DateOfBirth: "01/01/1970",
 	}
 
-	mp := NewMongoUsers(newResourceManager())
+	mp := NewMongoUsers()
 	err := mp.AddUser(User)
 	if err != nil {
 		t.Errorf("Failed to add User to database")
@@ -57,7 +52,7 @@ func TestMongoDBUpdateUserIntegration(t *testing.T) {
 		DateOfBirth: "01/01/1970",
 	}
 
-	mp := NewMongoUsers(newResourceManager())
+	mp := NewMongoUsers()
 	err := mp.UpdateUser(User)
 	if err != nil {
 		t.Fail()
@@ -70,7 +65,7 @@ func TestMongoDBGetUsersIntegration(t *testing.T) {
 		t.Skip("Test skipped during unit tests")
 	}
 
-	mp := NewMongoUsers(newResourceManager())
+	mp := NewMongoUsers()
 	Users := mp.GetUsers()
 	if Users == nil {
 		t.Fail()
@@ -84,7 +79,7 @@ func TestMongoDBGetUserByIDIntegration(t *testing.T) {
 		t.Skip("Test skipped during unit tests")
 	}
 
-	mp := NewMongoUsers(newResourceManager())
+	mp := NewMongoUsers()
 	_, err := mp.GetUserByID("c9ddfb2f-fc4d-40f3-87c0-f6713024a993")
 	if err != nil {
 		t.Fail()
