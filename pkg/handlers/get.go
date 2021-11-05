@@ -5,12 +5,15 @@ import (
 	"net/http"
 
 	"github.com/Ubivius/microservice-user/pkg/data"
+	"go.opentelemetry.io/otel"
 )
 
 // GetUsers returns the full list of users
 func (userHandler *UsersHandler) GetUsers(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("user").Start(request.Context(), "getUsers")
+	defer span.End()
 	log.Info("GetUsers request")
-	userList := userHandler.db.GetUsers()
+	userList := userHandler.db.GetUsers(request.Context())
 	err := json.NewEncoder(responseWriter).Encode(userList)
 	if err != nil {
 		log.Error(err, "Error serializing user")
@@ -20,11 +23,13 @@ func (userHandler *UsersHandler) GetUsers(responseWriter http.ResponseWriter, re
 
 // GetUserByID returns a single user from the database
 func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("user").Start(request.Context(), "getUsersById")
+	defer span.End()
 	id := getUserID(request)
 
 	log.Info("GetUserByID request", "id", id)
 
-	user, err := userHandler.db.GetUserByID(id)
+	user, err := userHandler.db.GetUserByID(request.Context(), id)
 
 	switch err {
 	case nil:
