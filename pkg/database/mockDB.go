@@ -1,8 +1,11 @@
 package database
 
 import (
+	"context"
+
 	"github.com/Ubivius/microservice-user/pkg/data"
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 )
 
 type MockUsers struct {
@@ -26,12 +29,16 @@ func (mp *MockUsers) CloseDB() {
 }
 
 //Return every users
-func (mp *MockUsers) GetUsers() data.Users {
+func (mp *MockUsers) GetUsers(ctx context.Context) data.Users {
+	_, span := otel.Tracer("users").Start(ctx, "getUsersDatabase")
+	defer span.End()
 	return userList
 }
 
 // GetUserByID returns a single user with the given id
-func (mp *MockUsers) GetUserByID(id string) (*data.User, error) {
+func (mp *MockUsers) GetUserByID(ctx context.Context, id string) (*data.User, error) {
+	_, span := otel.Tracer("users").Start(ctx, "getUserByIdDatabase")
+	defer span.End()
 	index := findIndexByUserID(id)
 	if index == -1 {
 		return nil, data.ErrorUserNotFound
@@ -40,14 +47,18 @@ func (mp *MockUsers) GetUserByID(id string) (*data.User, error) {
 }
 
 // AddUser creates a new user
-func (mp *MockUsers) AddUser(user *data.User) error {
+func (mp *MockUsers) AddUser(ctx context.Context, user *data.User) error {
+	_, span := otel.Tracer("users").Start(ctx, "addUserDatabase")
+	defer span.End()
 	user.ID = uuid.NewString()
 	userList = append(userList, user)
 	return nil
 }
 
 // UpdateUser updates the user specified in received JSON
-func (mp *MockUsers) UpdateUser(user *data.User) error {
+func (mp *MockUsers) UpdateUser(ctx context.Context, user *data.User) error {
+	_, span := otel.Tracer("users").Start(ctx, "updateUserDatabase")
+	defer span.End()
 	index := findIndexByUserID(user.ID)
 	if index == -1 {
 		return data.ErrorUserNotFound
@@ -57,7 +68,9 @@ func (mp *MockUsers) UpdateUser(user *data.User) error {
 }
 
 // DeleteUser deletes the user with the given id
-func (mp *MockUsers) DeleteUser(id string) error {
+func (mp *MockUsers) DeleteUser(ctx context.Context, id string) error {
+	_, span := otel.Tracer("users").Start(ctx, "deleteUserDatabase")
+	defer span.End()
 	index := findIndexByUserID(id)
 	if index == -1 {
 		return data.ErrorUserNotFound
