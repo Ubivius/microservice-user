@@ -15,6 +15,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/prometheus/common v0.31.1
+	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v0.0.0-20180714160509-73f8eece6fdc // indirect
 	go.etcd.io/etcd v0.5.0-alpha.5.0.20200910180754-dd1b699fc489 // indirect
@@ -22,6 +23,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.26.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo v0.26.1 // indirect
 	go.opentelemetry.io/contrib/propagators v0.20.0 // indirect
+	go.opentelemetry.io/otel v1.1.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout v0.19.0
 	go.opentelemetry.io/otel/sdk v1.0.1
 	go.uber.org/tools v0.0.0-20190618225709-2cfd321de3ee // indirect
