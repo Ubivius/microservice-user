@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"testing"
 
 	"github.com/Ubivius/microservice-user/pkg/data"
@@ -32,7 +33,7 @@ func TestMongoDBAddUserIntegration(t *testing.T) {
 	}
 
 	mp := NewMongoUsers()
-	err := mp.AddUser(User)
+	err := mp.AddUser(context.Background(), User)
 	if err != nil {
 		t.Errorf("Failed to add User to database")
 	}
@@ -53,7 +54,7 @@ func TestMongoDBUpdateUserIntegration(t *testing.T) {
 	}
 
 	mp := NewMongoUsers()
-	err := mp.UpdateUser(User)
+	err := mp.UpdateUser(context.Background(), User)
 	if err != nil {
 		t.Fail()
 	}
@@ -66,7 +67,7 @@ func TestMongoDBGetUsersIntegration(t *testing.T) {
 	}
 
 	mp := NewMongoUsers()
-	Users := mp.GetUsers()
+	Users := mp.GetUsers(context.Background())
 	if Users == nil {
 		t.Fail()
 	}
@@ -80,7 +81,7 @@ func TestMongoDBGetUserByIDIntegration(t *testing.T) {
 	}
 
 	mp := NewMongoUsers()
-	_, err := mp.GetUserByID("c9ddfb2f-fc4d-40f3-87c0-f6713024a993")
+	_, err := mp.GetUserByID(context.Background(), "c9ddfb2f-fc4d-40f3-87c0-f6713024a993")
 	if err != nil {
 		t.Fail()
 	}
