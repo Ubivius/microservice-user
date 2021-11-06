@@ -31,10 +31,32 @@ func integrationTestSetup(t *testing.T) {
 	}
 }
 
+func addProductAndGetId(t *testing.T) string {
+	t.Log("Adding product")
+	user := &data.User{
+		FirstName:   "testName",
+		Username:    "testUsername",
+		Email:       "test@email.com",
+		DateOfBirth: "01/01/1970",
+	}
+
+	mp := NewMongoUsers()
+	err := mp.AddUser(context.Background(), user)
+	if err != nil {
+		t.Errorf("Failed to add product to database")
+	}
+
+	t.Log("Fetching new user ID")
+	products := mp.GetUsers(context.Background())
+	mp.CloseDB()
+	return products[len(products)-1].ID
+}
+
 func TestMongoDBConnectionAndShutdownIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Test skipped during unit tests")
 	}
+	integrationTestSetup(t)
 
 	mp := NewMongoUsers()
 	if mp == nil {
@@ -47,8 +69,9 @@ func TestMongoDBAddUserIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Test skipped during unit tests")
 	}
+	integrationTestSetup(t)
 
-	User := &data.User{
+	user := &data.User{
 		FirstName:   "testName",
 		Username:    "testUsername",
 		Email:       "test@email.com",
@@ -56,9 +79,16 @@ func TestMongoDBAddUserIntegration(t *testing.T) {
 	}
 
 	mp := NewMongoUsers()
-	err := mp.AddUser(context.Background(), User)
+	err := mp.AddUser(context.Background(), user)
 	if err != nil {
 		t.Errorf("Failed to add User to database")
+	}
+	users := mp.GetUsers(context.Background())
+	if len(users) < 1 {
+		t.Errorf("Added user missing from database")
+	}
+	if len(users) > 1 {
+		t.Errorf("User added to database several times during add user call")
 	}
 	mp.CloseDB()
 }
