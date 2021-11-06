@@ -46,9 +46,9 @@ func addUserAndGetId(t *testing.T) string {
 	}
 
 	t.Log("Fetching new user ID")
-	products := mp.GetUsers(context.Background())
+	users := mp.GetUsers(context.Background())
 	mp.CloseDB()
-	return products[len(products)-1].ID
+	return users[len(users)-1].ID
 }
 
 func TestMongoDBConnectionAndShutdownIntegration(t *testing.T) {
@@ -59,7 +59,7 @@ func TestMongoDBConnectionAndShutdownIntegration(t *testing.T) {
 
 	mp := NewMongoUsers()
 	if mp == nil {
-		t.Fail()
+		t.Error("MongoDB connection is null")
 	}
 	mp.CloseDB()
 }
@@ -97,6 +97,7 @@ func TestMongoDBUpdateUserIntegration(t *testing.T) {
 		t.Skip("Test skipped during unit tests")
 	}
 	integrationTestSetup(t)
+
 	userID := addUserAndGetId(t)
 
 	user := &data.User{
@@ -127,6 +128,7 @@ func TestMongoDBGetUsersIntegration(t *testing.T) {
 		t.Skip("Test skipped during unit tests")
 	}
 	integrationTestSetup(t)
+
 	addUserAndGetId(t)
 
 	mp := NewMongoUsers()
@@ -143,6 +145,7 @@ func TestMongoDBGetUserByIDIntegration(t *testing.T) {
 		t.Skip("Test skipped during unit tests")
 	}
 	integrationTestSetup(t)
+
 	userID := addUserAndGetId(t)
 
 	mp := NewMongoUsers()
