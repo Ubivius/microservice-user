@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/Ubivius/microservice-user/pkg/data"
-	"github.com/google/uuid"
 )
 
 func integrationTestSetup(t *testing.T) {
@@ -31,7 +30,7 @@ func integrationTestSetup(t *testing.T) {
 	}
 }
 
-func addProductAndGetId(t *testing.T) string {
+func addUserAndGetId(t *testing.T) string {
 	t.Log("Adding product")
 	user := &data.User{
 		FirstName:   "testName",
@@ -97,19 +96,28 @@ func TestMongoDBUpdateUserIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Test skipped during unit tests")
 	}
+	integrationTestSetup(t)
+	userID := addUserAndGetId(t)
 
-	User := &data.User{
-		ID:          uuid.NewString(),
-		FirstName:   "testName",
+	user := &data.User{
+		ID:          userID,
+		FirstName:   "newName",
 		Username:    "testUsername",
 		Email:       "test@email.com",
 		DateOfBirth: "01/01/1970",
 	}
 
 	mp := NewMongoUsers()
-	err := mp.UpdateUser(context.Background(), User)
+	err := mp.UpdateUser(context.Background(), user)
 	if err != nil {
-		t.Fail()
+		t.Errorf("Error updating user " + err.Error())
+	}
+	updatedUser, err := mp.GetUserByID(context.Background(), userID)
+	if err != nil {
+		t.Errorf("Error fetching updated user " + err.Error())
+	}
+	if updatedUser.FirstName != "newName" {
+		t.Errorf("First name updated incorrectly, expected %s but got %s", user.FirstName, updatedUser.FirstName)
 	}
 	mp.CloseDB()
 }
@@ -118,10 +126,12 @@ func TestMongoDBGetUsersIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Test skipped during unit tests")
 	}
+	integrationTestSetup(t)
+	addUserAndGetId(t)
 
 	mp := NewMongoUsers()
 	Users := mp.GetUsers(context.Background())
-	if Users == nil {
+	if Users == nil || len(Users) != 1 {
 		t.Fail()
 	}
 
@@ -132,11 +142,19 @@ func TestMongoDBGetUserByIDIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Test skipped during unit tests")
 	}
+	integrationTestSetup(t)
+	userID := addUserAndGetId(t)
 
 	mp := NewMongoUsers()
-	_, err := mp.GetUserByID(context.Background(), "c9ddfb2f-fc4d-40f3-87c0-f6713024a993")
+	user, err := mp.GetUserByID(context.Background(), userID)
 	if err != nil {
-		t.Fail()
+		t.Error("Failed getting user")
+	}
+	if user == nil {
+		t.Error("Returned user is nil")
+	}
+	if user != nil && user.ID != userID {
+		t.Error("Returned incorrect user")
 	}
 
 	mp.CloseDB()
