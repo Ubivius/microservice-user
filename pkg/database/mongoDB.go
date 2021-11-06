@@ -126,9 +126,14 @@ func (mp *MongoUsers) UpdateUser(ctx context.Context, User *data.User) error {
 	update := bson.M{"$set": User}
 
 	// Update a single item in the database with the values in update that match the filter
-	_, err := mp.collection.UpdateOne(ctx, filter, update)
+	updateResult, err := mp.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Error(err, "Error updating User.")
+	}
+
+	if updateResult.MatchedCount != 1 {
+		log.Error(data.ErrorUserNotFound, "No matches found for update")
+		return err
 	}
 
 	return err
