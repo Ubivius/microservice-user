@@ -9,14 +9,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.opentelemetry.io/contrib/instrumentation/go.mongodb.org/mongo-driver/mongo/otelmongo"
 )
 
 // ErrorEnvVar : Environment variable error
 var ErrorEnvVar = fmt.Errorf("missing environment variable")
 
 type MongoUsers struct {
-	client           *mongo.Client
-	collection       *mongo.Collection
+	client     *mongo.Client
+	collection *mongo.Collection
 }
 
 func NewMongoUsers() UserDB {
@@ -32,19 +33,21 @@ func NewMongoUsers() UserDB {
 
 func (mp *MongoUsers) Connect() error {
 	uri := mongodbURI()
-	
+
 	// Setting client options
-	clientOptions := options.Client().ApplyURI(uri)
+	opts := options.Client()
+	clientOptions := opts.ApplyURI(uri)
+	opts.Monitor = otelmongo.NewMonitor()
 
 	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil || client == nil {
 		log.Error(err, "Failed to connect to database. Shutting down service")
 		os.Exit(1)
 	}
 
 	// Ping DB
-	err = client.Ping(context.TODO(), nil)
+	err = client.Ping(context.Background(), nil)
 	if err != nil {
 		log.Error(err, "Failed to ping database. Shutting down service")
 		os.Exit(1)
@@ -61,28 +64,28 @@ func (mp *MongoUsers) Connect() error {
 }
 
 func (mp *MongoUsers) PingDB() error {
-	return mp.client.Ping(context.TODO(), nil)
+	return mp.client.Ping(context.Background(), nil)
 }
 
 func (mp *MongoUsers) CloseDB() {
-	err := mp.client.Disconnect(context.TODO())
+	err := mp.client.Disconnect(context.Background())
 	if err != nil {
 		log.Error(err, "Error while disconnecting from database")
 	}
 }
 
-func (mp *MongoUsers) GetUsers() data.Users {
+func (mp *MongoUsers) GetUsers(ctx context.Context) data.Users {
 	// Users will hold the array of Users
 	var users data.Users
 
 	// Find returns a cursor that must be iterated through
-	cursor, err := mp.collection.Find(context.TODO(), bson.D{})
+	cursor, err := mp.collection.Find(ctx, bson.D{})
 	if err != nil {
 		log.Error(err, "Error getting Users from database")
 	}
 
 	// Iterating through cursor
-	for cursor.Next(context.TODO()) {
+	for cursor.Next(ctx) {
 		var result data.User
 		err := cursor.Decode(&result)
 		if err != nil {
@@ -96,12 +99,12 @@ func (mp *MongoUsers) GetUsers() data.Users {
 	}
 
 	// Close the cursor once finished
-	cursor.Close(context.TODO())
+	cursor.Close(ctx)
 
 	return users
 }
 
-func (mp *MongoUsers) GetUserByID(id string) (*data.User, error) {
+func (mp *MongoUsers) GetUserByID(ctx context.Context, id string) (*data.User, error) {
 	// MongoDB search filter
 	filter := bson.D{{Key: "_id", Value: id}}
 
@@ -109,13 +112,13 @@ func (mp *MongoUsers) GetUserByID(id string) (*data.User, error) {
 	var result data.User
 
 	// Find a single matching item from the database
-	err := mp.collection.FindOne(context.TODO(), filter).Decode(&result)
+	err := mp.collection.FindOne(ctx, filter).Decode(&result)
 
 	// Parse result into the returned User
 	return &result, err
 }
 
-func (mp *MongoUsers) UpdateUser(User *data.User) error {
+func (mp *MongoUsers) UpdateUser(ctx context.Context, User *data.User) error {
 	// MongoDB search filter
 	filter := bson.D{{Key: "_id", Value: User.ID}}
 
@@ -123,17 +126,22 @@ func (mp *MongoUsers) UpdateUser(User *data.User) error {
 	update := bson.M{"$set": User}
 
 	// Update a single item in the database with the values in update that match the filter
-	_, err := mp.collection.UpdateOne(context.TODO(), filter, update)
+	updateResult, err := mp.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Error(err, "Error updating User.")
+	}
+
+	if updateResult.MatchedCount != 1 {
+		log.Error(data.ErrorUserNotFound, "No matches found for update")
+		return err
 	}
 
 	return err
 }
 
-func (mp *MongoUsers) AddUser(User *data.User) error {
+func (mp *MongoUsers) AddUser(ctx context.Context, User *data.User) error {
 	// Inserting the new User into the database
-	insertResult, err := mp.collection.InsertOne(context.TODO(), User)
+	insertResult, err := mp.collection.InsertOne(ctx, User)
 	if err != nil {
 		return err
 	}
@@ -142,12 +150,12 @@ func (mp *MongoUsers) AddUser(User *data.User) error {
 	return nil
 }
 
-func (mp *MongoUsers) DeleteUser(id string) error {
+func (mp *MongoUsers) DeleteUser(ctx context.Context, id string) error {
 	// MongoDB search filter
 	filter := bson.D{{Key: "_id", Value: id}}
 
 	// Delete a single item matching the filter
-	result, err := mp.collection.DeleteOne(context.TODO(), filter)
+	result, err := mp.collection.DeleteOne(ctx, filter)
 	if err != nil {
 		log.Error(err, "Error deleting User")
 	}
@@ -156,7 +164,23 @@ func (mp *MongoUsers) DeleteUser(id string) error {
 	return nil
 }
 
-func mongodbURI() string { 
+func deleteAllUsersFromMongoDB() error {
+	uri := mongodbURI()
+
+	// Setting client options
+	opts := options.Client()
+	clientOptions := opts.ApplyURI(uri)
+	client, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil || client == nil {
+		log.Error(err, "Failed to connect to database. Failing test")
+		return err
+	}
+	collection := client.Database("ubivius").Collection("users")
+	_, err = collection.DeleteMany(context.Background(), bson.D{{}})
+	return err
+}
+
+func mongodbURI() string {
 	hostname := os.Getenv("DB_HOSTNAME")
 	port := os.Getenv("DB_PORT")
 	username := os.Getenv("DB_USERNAME")
