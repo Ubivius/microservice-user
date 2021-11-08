@@ -126,9 +126,14 @@ func (mp *MongoUsers) UpdateUser(ctx context.Context, User *data.User) error {
 	update := bson.M{"$set": User}
 
 	// Update a single item in the database with the values in update that match the filter
-	_, err := mp.collection.UpdateOne(ctx, filter, update)
+	updateResult, err := mp.collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		log.Error(err, "Error updating User.")
+	}
+
+	if updateResult.MatchedCount != 1 {
+		log.Error(data.ErrorUserNotFound, "No matches found for update")
+		return err
 	}
 
 	return err
@@ -157,6 +162,22 @@ func (mp *MongoUsers) DeleteUser(ctx context.Context, id string) error {
 
 	log.Info("Deleted documents in Users collection", "delete_count", result.DeletedCount)
 	return nil
+}
+
+func deleteAllUsersFromMongoDB() error {
+	uri := mongodbURI()
+
+	// Setting client options
+	opts := options.Client()
+	clientOptions := opts.ApplyURI(uri)
+	client, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil || client == nil {
+		log.Error(err, "Failed to connect to database. Failing test")
+		return err
+	}
+	collection := client.Database("ubivius").Collection("users")
+	_, err = collection.DeleteMany(context.Background(), bson.D{{}})
+	return err
 }
 
 func mongodbURI() string {

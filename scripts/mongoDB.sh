@@ -7,10 +7,10 @@ port=27888
 username=admin
 password=pass
 
-setx DB_HOSTNAME $hostname
-setx DB_PORT $port
-setx DB_USERNAME $username
-setx DB_PASSWORD $password
+export DB_HOSTNAME=$hostname
+export DB_PORT=$port
+export DB_USERNAME=$username
+export DB_PASSWORD=$password
 
 # If mongoDB container is running, exit.
 running_app_container=`docker ps | grep local-mongo | wc -l`
