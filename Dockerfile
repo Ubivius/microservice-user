@@ -23,4 +23,5 @@ FROM ${BUILD_TYPE} AS exit_artefact
 COPY --from=build-env /go/src/main /microservice
 EXPOSE 8888
 EXPOSE 9090
+ENV JAEGER_ENDPOINT=http://jeager-tracing-collector/api/traces
 CMD ["/microservice"]
