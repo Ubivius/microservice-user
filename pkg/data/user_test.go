@@ -21,7 +21,7 @@ func TestInvalidRelationshipType(t *testing.T) {
 		Username:    "JeremiS",
 		Email:       "jeremi@gmail.com",
 		DateOfBirth: "01/01/1999",
-		Status: "Away",
+		Status:      "Away",
 	}
 
 	err := u.Validate()
