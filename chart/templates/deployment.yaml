@@ -5,6 +5,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "microservice-user.labels" . | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.annotations | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -30,8 +32,13 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 9090
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
+{{- range .Values.service.otherPorts }}          
+            - name: {{ .name }}
+              containerPort: {{ .port }}
+              protocol: TCP
+{{- end}}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
