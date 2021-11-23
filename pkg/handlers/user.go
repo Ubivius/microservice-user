@@ -27,3 +27,11 @@ func getUserID(request *http.Request) string {
 	id := vars["id"]
 	return id
 }
+
+// getUsername extracts the username from the URL
+// The verification of this variable is handled by gorilla/mux
+func getUsername(request *http.Request) string {
+	vars := mux.Vars(request)
+	username := vars["username"]
+	return username
+}
