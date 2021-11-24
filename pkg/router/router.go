@@ -23,6 +23,7 @@ func New(userHandler *handlers.UsersHandler) *mux.Router {
 	getRouter.Use(tokenValidation.Middleware)
 	getRouter.HandleFunc("/users", userHandler.GetUsers)
 	getRouter.HandleFunc("/users/{id:[0-9a-z-]+}", userHandler.GetUserByID)
+	getRouter.HandleFunc("/users/username/{username}", userHandler.GetUserByUsername)
 
 	//Health Check
 	getRouter.HandleFunc("/health/live", userHandler.LivenessCheck)
