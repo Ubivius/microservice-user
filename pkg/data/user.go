@@ -9,12 +9,11 @@ var ErrorUserNotFound = fmt.Errorf("User not found")
 // StatusType of a status
 type StatusType string
 
-// status type of a player
 const (
-	Online  StatusType = "Online"  // user is online
-	Offline StatusType = "Offline" // user is offline
-	InLobby StatusType = "InLobby" // user is in lobby
-	InGame  StatusType = "InGame"  // user is in game
+	Online  StatusType = "Online"
+	Offline StatusType = "Offline"
+	InLobby StatusType = "InLobby"
+	InGame  StatusType = "InGame"
 )
 
 type User struct {
