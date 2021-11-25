@@ -17,6 +17,7 @@ func TestValidationMiddlewareWithValidBody(t *testing.T) {
 		Username:    "addName",
 		Email:       "user@email.com",
 		DateOfBirth: "01/01/1999",
+		Status:      "Online",
 	}
 	bodyBytes, _ := json.Marshal(body)
 

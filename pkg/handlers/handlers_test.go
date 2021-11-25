@@ -77,6 +77,50 @@ func TestGetNonExistingUserByID(t *testing.T) {
 	}
 }
 
+func TestGetExistingUserByUsername(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "/users/username/JeremiS", nil)
+	response := httptest.NewRecorder()
+
+	userHandler := NewUsersHandler(newUserDB())
+
+	// Mocking gorilla/mux vars
+	vars := map[string]string{
+		"username": "JeremiS",
+	}
+	request = mux.SetURLVars(request, vars)
+
+	userHandler.GetUserByUsername(response, request)
+
+	if response.Code != http.StatusOK {
+		t.Errorf("Expected status code %d but got : %d", http.StatusOK, response.Code)
+	}
+	if !strings.Contains(response.Body.String(), "a2181017-5c53-422b-b6bc-036b27c04fc8") {
+		t.Error("Missing elements from expected results")
+	}
+}
+
+func TestGetNonExistingUserByUsername(t *testing.T) {
+	request := httptest.NewRequest(http.MethodGet, "/users/username/Test", nil)
+	response := httptest.NewRecorder()
+
+	userHandler := NewUsersHandler(newUserDB())
+
+	// Mocking gorilla/mux vars
+	vars := map[string]string{
+		"id": uuid.NewString(),
+	}
+	request = mux.SetURLVars(request, vars)
+
+	userHandler.GetUserByUsername(response, request)
+
+	if response.Code != http.StatusBadRequest {
+		t.Errorf("Expected status code %d but got : %d", http.StatusBadRequest, response.Code)
+	}
+	if !strings.Contains(response.Body.String(), "User not found") {
+		t.Error("Expected response : User not found")
+	}
+}
+
 func TestDeleteNonExistantUser(t *testing.T) {
 	request := httptest.NewRequest(http.MethodDelete, "/users/4", nil)
 	response := httptest.NewRecorder()
