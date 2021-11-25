@@ -11,7 +11,8 @@ func (user *User) Validate() error {
 	err1 := validate.RegisterValidation("email", validateEmail)
 
 	err2 := validate.RegisterValidation("dateofbirth", validateDateOfBirth)
-	if err1 != nil || err2 != nil {
+	err3 := validate.RegisterValidation("isStatusType", validateIsStatusType)
+	if err1 != nil || err2 != nil || err3 != nil {
 		panic("Validator connexions failed")
 	}
 	return validate.Struct(user)
@@ -29,4 +30,15 @@ func validateDateOfBirth(fl validator.FieldLevel) bool {
 	matches := re.FindAllString(fl.Field().String(), -1)
 
 	return len(matches) == 1
+}
+
+// validates the status type is valid
+func validateIsStatusType(fieldLevel validator.FieldLevel) bool {
+	statusType := fieldLevel.Field().String()
+
+	switch statusType {
+    case string(Online), string(Offline), string(InGame):
+        return true
+    }
+	return false
 }

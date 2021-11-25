@@ -118,6 +118,20 @@ func (mp *MongoUsers) GetUserByID(ctx context.Context, id string) (*data.User, e
 	return &result, err
 }
 
+func (mp *MongoUsers) GetUserByUsername(ctx context.Context, username string) (*data.User, error) {
+	// MongoDB search filter
+	filter := bson.D{{Key: "username", Value: username}}
+
+	// Holds search result
+	var result data.User
+
+	// Find a single matching item from the database
+	err := mp.collection.FindOne(ctx, filter).Decode(&result)
+
+	// Parse result into the returned User
+	return &result, err
+}
+
 func (mp *MongoUsers) UpdateUser(ctx context.Context, User *data.User) error {
 	// MongoDB search filter
 	filter := bson.D{{Key: "_id", Value: User.ID}}

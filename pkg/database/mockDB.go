@@ -46,6 +46,17 @@ func (mp *MockUsers) GetUserByID(ctx context.Context, id string) (*data.User, er
 	return userList[index], nil
 }
 
+// GetUserByUsername returns a single user with the given id
+func (mp *MockUsers) GetUserByUsername(ctx context.Context, username string) (*data.User, error) {
+	_, span := otel.Tracer("users").Start(ctx, "getUserByUsernameDatabase")
+	defer span.End()
+	index := findIndexByUsername(username)
+	if index == -1 {
+		return nil, data.ErrorUserNotFound
+	}
+	return userList[index], nil
+}
+
 // AddUser creates a new user
 func (mp *MockUsers) AddUser(ctx context.Context, user *data.User) error {
 	_, span := otel.Tracer("users").Start(ctx, "addUserDatabase")
@@ -87,6 +98,17 @@ func (mp *MockUsers) DeleteUser(ctx context.Context, id string) error {
 func findIndexByUserID(id string) int {
 	for index, user := range userList {
 		if user.ID == id {
+			return index
+		}
+	}
+	return -1
+}
+
+// Returns the index of a user in the database
+// Returns -1 when no user is found
+func findIndexByUsername(username string) int {
+	for index, user := range userList {
+		if user.Username == username {
 			return index
 		}
 	}
