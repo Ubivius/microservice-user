@@ -48,3 +48,31 @@ func (userHandler *UsersHandler) GetUserByID(responseWriter http.ResponseWriter,
 		return
 	}
 }
+
+// GetUserByUsername returns a single user from the database
+func (userHandler *UsersHandler) GetUserByUsername(responseWriter http.ResponseWriter, request *http.Request) {
+	_, span := otel.Tracer("user").Start(request.Context(), "getUsersByUsername")
+	defer span.End()
+	username := getUsername(request)
+
+	log.Info("GetUserByUsername request", "username", username)
+
+	user, err := userHandler.db.GetUserByUsername(request.Context(), username)
+
+	switch err {
+	case nil:
+		err = json.NewEncoder(responseWriter).Encode(user)
+		if err != nil {
+			log.Error(err, "Error serializing user")
+		}
+		return
+	case data.ErrorUserNotFound:
+		log.Error(err, "User not found")
+		http.Error(responseWriter, "User not found", http.StatusBadRequest)
+		return
+	default:
+		log.Error(err, "Error getting user")
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
